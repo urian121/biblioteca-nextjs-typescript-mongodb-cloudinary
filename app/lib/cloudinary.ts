@@ -41,3 +41,35 @@ export async function uploadBufferToCloudinary(buffer: Buffer, folder = "books")
   const json = await res.json();
   return { url: json.secure_url, public_id: json.public_id };
 }
+
+/**
+ * Elimina un recurso de Cloudinary por su public_id usando el Upload API.
+ * Retorna true si Cloudinary responde "ok"; lanza error en caso contrario.
+ */
+export async function deleteCloudinaryByPublicId(publicId: string, invalidate = true): Promise<boolean> {
+  const timestamp = Math.floor(Date.now() / 1000);
+  const params: Record<string, string | number> = { public_id: publicId, timestamp };
+  if (invalidate) params.invalidate = "true";
+  const signature = generateSignature(params);
+
+  const form = new URLSearchParams();
+  form.append("public_id", publicId);
+  if (invalidate) form.append("invalidate", "true");
+  form.append("api_key", API_KEY);
+  form.append("timestamp", String(timestamp));
+  form.append("signature", signature);
+
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/destroy`, {
+    method: "POST",
+    body: form,
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Cloudinary destroy failed: ${res.status} ${text}`);
+  }
+  const json = await res.json();
+  if (json.result !== "ok") {
+    throw new Error(`Cloudinary destroy failed: ${json.result ?? "unknown error"}`);
+  }
+  return true;
+}

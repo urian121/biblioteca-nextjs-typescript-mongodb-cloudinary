@@ -1,4 +1,5 @@
 import { connect } from "@/lib/mongoose";
+import { deleteCloudinaryByPublicId } from "@/lib/cloudinary";
 import { BookModel } from "@/models/Book";
 import { BookViewModel } from "@/models/BookView";
 import { BookLikeModel } from "@/models/BookLike";
@@ -85,12 +86,22 @@ export async function updateBook(id: string, data: BookUpdate): Promise<BookItem
 // Elimina un libro por id
 export async function deleteBook(id: string): Promise<void> {
   await connect();
+  // Recupera primero el documento para obtener el public_id de la portada
+  const doc = await BookModel.findById(id).lean();
   await BookModel.findByIdAndDelete(id);
   // Limpieza relacionada
   await Promise.all([
     BookViewModel.deleteOne({ book: id }),
     BookLikeModel.deleteOne({ book: id }),
   ]);
+  // Elimina imagen en Cloudinary si existe
+  if (doc?.coverPublicId) {
+    try {
+      await deleteCloudinaryByPublicId(String(doc.coverPublicId));
+    } catch (err) {
+      console.error("Error eliminando imagen en Cloudinary:", err);
+    }
+  }
 }
 
 // Estadísticas: vistas y likes
