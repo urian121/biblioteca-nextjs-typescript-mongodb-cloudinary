@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import "server-only";
 import Link from "next/link";
+import Image from "next/image";
 import type { BookUpdate } from "@/types/book";
 import { ArrowLeft, Save } from "lucide-react";
 
@@ -71,7 +72,16 @@ export default async function EditPage({ params }: { params: Promise<{ id: strin
         </div>
         <div className="space-y-1">
           <label htmlFor="cover" className="block text-sm text-slate-600">Portada (imagen)</label>
-          <input id="cover" name="cover" type="file" accept="image/*" className="w-full border p-2 rounded" />
+          <div className="flex items-center gap-3">
+            <Image
+              src={b.coverUrl ?? "/bookshop.png"}
+              alt={`Portada de ${b.title}`}
+              width={96}
+              height={144}
+              className="rounded border object-cover bg-white"
+            />
+            <input id="cover" name="cover" type="file" accept="image/*" className="flex-1 border p-2 rounded" />
+          </div>
         </div>
         <div className="flex gap-2">
           <button className="bg-udemy-purple-purple text-white px-4 py-2 rounded inline-flex items-center gap-2 hover:cursor-pointer">
