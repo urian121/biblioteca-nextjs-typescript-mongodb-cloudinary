@@ -36,7 +36,7 @@ export default function RootLayout({
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} strokeWidth={2} aria-hidden="true" />
                 <input
                   name="q"
-                  placeholder="Buscar cualquier cosa"
+                  placeholder="Buscar libro..."
                   className="w-full bg-white text-slate-900 pl-10 pr-4 py-2 rounded-full border border-slate-300 focus:outline-none focus:border-transparent focus:ring-2 focus:ring-(--color-udemy-purple-purple) placeholder:text-slate-500 transition"
                 />
               </div>
